@@ -8,7 +8,7 @@
 > **Bug class:** CWE-347 / CWE-807 (signature covers a different byte range than the one executed) leading to CWE-125 (out-of-bounds read)
 > **Severity:** Medium — `CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N` (confidentiality-only)
 >
-> ✅ **Every claim below was re-verified live against the server and the downloaded binary on 2026-11-24.** Addresses are from `capstone` disassembly of the retrieved ELF; protocol behaviour and the flag are from live `POST`s. Raw evidence is in [Appendix D](#appendix-d--live-verification-log).
+> **Every claim below was re-verified live against the server and the downloaded binary on 2026-11-24.** Addresses are from `capstone` disassembly of the retrieved ELF; protocol behaviour and the flag are from live `POST`s. Raw evidence is in [Appendix D](#appendix-d--live-verification-log).
 
 ---
 
@@ -411,8 +411,8 @@ So **Brainfuck cell 256 is the first byte of the flag**, and the interpreter per
 ```
 
 ```
-  '>'*256 + '.'*168      → "IIIIIII…"   (reads cell 256 repeatedly — the 'I')   ✓ live
-  '>'*256 + '.>'*84      → the full flag                                         ✓ live
+  '>'*256 + '.'*168      → "IIIIIII…"   (reads cell 256 repeatedly — the 'I')   [live]
+  '>'*256 + '.>'*84      → the full flag                                         [live]
 ```
 
 The flag was confirmed multiple times with independent programs before a line of the report was written.

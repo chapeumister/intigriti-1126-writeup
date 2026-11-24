@@ -11,127 +11,191 @@
 <meta property="og:type" content="article">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0c0f; --raised:#12161b; --raised2:#171c22; --code:#0d1217;
-  --ink:#e7ebef; --ink2:#aeb7c2; --muted:#727d8a;
-  --accent:#58d7a3; --accent-dim:#2f6f58; --flag:#7ee3b4;
-  --line:#1e252d;
+  --bg:#08090c; --bg2:#0b0d11; --raised:#12161c; --raised2:#171d24; --code:#0c1116;
+  --ink:#e9edf1; --ink2:#b4bdc8; --muted:#818b99;
+  --verify:#5cd7a3; --verify-dim:#1f5a44;      /* hashed / signed / safe  */
+  --exec:#e8a25c; --exec-dim:#5a4320;           /* executed / attacker     */
+  --flag:#7ee3b4;
+  --line:#1c232b; --line2:#283039;
   --maxprose:46rem;
   --sans:'Inter',system-ui,-apple-system,sans-serif;
   --disp:'Fraunces',Georgia,serif;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-expo:cubic-bezier(.16,1,.3,1);
+  --ease-io:cubic-bezier(.76,0,.24,1);
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{
-  margin:0;background:var(--bg);color:var(--ink);
+body{margin:0;background:var(--bg);color:var(--ink);
   font-family:var(--sans);font-size:17px;line-height:1.65;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-}
-::selection{background:var(--accent-dim);color:#fff}
-a{color:var(--accent);text-decoration:none}
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+::selection{background:var(--verify-dim);color:#fff}
+a{color:var(--verify);text-decoration:none}
 a:hover{text-decoration:underline;text-underline-offset:3px}
+h1,h2,h3,h4{text-wrap:balance}
+
+/* reading progress */
+.progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--verify);z-index:60}
 
 /* top bar */
-.topbar{position:sticky;top:0;z-index:40;background:rgba(10,12,15,.82);
-  border-bottom:1px solid var(--line);backdrop-filter:none}
-.topbar .in{max-width:84rem;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:16px}
-.brand{font-weight:600;letter-spacing:-.01em;color:var(--ink)}
-.brand b{color:var(--accent)}
-.topbar .sev{margin-left:auto;color:var(--muted);font-size:13px;font-family:var(--mono)}
-.topbar .live{color:var(--accent)}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(8,9,12,.86);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:86rem;margin:0 auto;padding:13px 28px;display:flex;align-items:center;gap:16px}
+.brand{font-weight:600;letter-spacing:-.01em;color:var(--ink);font-size:15px}
+.brand b{color:var(--verify)}
+.topbar .sev{margin-left:auto;color:var(--muted);font-size:12.5px;font-family:var(--mono)}
+.topbar .live{color:var(--verify)}
 
-/* hero */
-.hero{max-width:84rem;margin:0 auto;padding:72px 28px 40px}
-.hero .doc-h1{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;
-  font-size:clamp(2.4rem,6vw,4.1rem);line-height:1.02;margin:0 0 .5em;max-width:18ch}
-.hero .sub{font-size:clamp(1.15rem,2.4vw,1.5rem);line-height:1.3;color:var(--ink2);
-  font-weight:400;max-width:34ch;margin:0 0 2.2rem}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:1px;background:var(--line);border-radius:12px;overflow:hidden;max-width:62rem}
-.facts .f{background:var(--raised);padding:16px 20px}
-.facts .k{font-size:12.5px;color:var(--muted);margin-bottom:5px}
-.facts .v{font-size:15px;color:var(--ink);font-family:var(--mono);word-break:break-word}
+/* ===== hero ===== */
+.hero{position:relative;max-width:86rem;margin:0 auto;padding:92px 28px 48px;overflow:hidden}
+#byterain{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.42;pointer-events:none}
+.hero .wrap{position:relative;z-index:1}
+.kick{font-family:var(--sans);font-weight:500;font-size:14px;color:var(--verify);margin:0 0 20px}
+.kick::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:var(--verify);margin-right:9px;vertical-align:middle}
+.hero h1{font-family:var(--disp);font-weight:600;letter-spacing:-.025em;
+  font-size:clamp(2.6rem,6.4vw,4.6rem);line-height:.98;margin:0 0 .36em;max-width:16ch}
+.hero .sub{font-size:clamp(1.15rem,2.3vw,1.5rem);line-height:1.34;color:var(--ink2);
+  font-weight:400;max-width:36ch;margin:0 0 1.8rem}
+.cta{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:15px;color:#06281d;
+  background:var(--verify);border-radius:9px;padding:13px 22px;margin:0 0 2.6rem;min-height:44px;
+  transition:transform .14s var(--ease-out),filter .18s}
+.cta::after{content:"↓"}
+.cta:hover{text-decoration:none;filter:brightness(1.08);transform:translateY(-1px)}
+.cta:active{transform:translateY(0) scale(.98)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:1px;background:var(--line);border-radius:14px;overflow:hidden;max-width:64rem}
+.facts .f{background:var(--raised);padding:17px 20px}
+.facts .k{font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.facts .v{font-size:15px;color:var(--ink);font-family:var(--mono);word-break:break-word;line-height:1.4}
 .facts .v.flag{color:var(--flag)}
-.facts .v.ok{color:var(--accent)}
+.facts .v.ok{color:var(--verify)}
 
-/* shell: sidebar + doc */
-.shell{max-width:84rem;margin:0 auto;padding:12px 28px 120px;
-  display:grid;grid-template-columns:1fr;gap:56px}
-@media(min-width:1080px){.shell{grid-template-columns:230px minmax(0,1fr)}}
+/* ===== exhibit (signature interactive) ===== */
+.exhibit{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:40px}
+.exhibit .in{max-width:72rem;margin:0 auto;padding:72px 28px 80px}
+.exhibit h2{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;
+  font-size:clamp(1.75rem,3.8vw,2.7rem);line-height:1.05;margin:0 0 .5em;max-width:16ch}
+.exhibit .lead{color:var(--ink2);font-size:1.08rem;max-width:56ch;margin:0 0 48px}
+.exhibit .lead b{color:var(--ink)}
 
+/* request strip */
+.panel{margin:0 0 20px}
+.panel-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0 0 16px}
+.panel-h h3{font-size:1.15rem;font-weight:600;margin:0;color:var(--ink)}
+.panel-h .note{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.frames{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap}
+.frame{flex:1 1 auto;min-width:0;background:var(--raised);border:1px solid var(--line2);border-radius:9px;
+  padding:13px 12px;position:relative;transition:border-color .24s var(--ease-out),background .24s var(--ease-out),transform .24s var(--ease-out)}
+.frame .fn{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--ink);letter-spacing:.02em}
+.frame .fd{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-top:4px}
+.frame.dim{opacity:.4}
+.frame.hl-v{border-color:var(--verify);background:color-mix(in srgb,var(--verify) 12%,var(--raised));transform:translateY(-3px)}
+.frame.hl-e{border-color:var(--exec);background:color-mix(in srgb,var(--exec) 13%,var(--raised));transform:translateY(-3px)}
+.frame .tag{position:absolute;top:-9px;left:11px;font-family:var(--mono);font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:5px;opacity:0;transition:opacity .2s}
+.frame.hl-v .tag.tv{opacity:1;background:var(--verify);color:#06281d}
+.frame.hl-e .tag.te{opacity:1;background:var(--exec);color:#2a1c05}
+.seg{display:inline-flex;background:var(--raised);border:1px solid var(--line2);border-radius:9px;padding:3px;gap:3px;margin:0 0 18px;flex-wrap:wrap}
+.seg button{font-family:var(--mono);font-size:12.5px;color:var(--ink2);background:none;border:none;
+  padding:8px 14px;border-radius:7px;cursor:pointer;transition:background .18s,color .18s}
+.seg button[data-k="v"].on{background:var(--verify);color:#06281d;font-weight:700}
+.seg button[data-k="e"].on{background:var(--exec);color:#2a1c05;font-weight:700}
+.seg button:not(.on):hover{color:var(--ink)}
+.explain{font-family:var(--mono);font-size:12.5px;color:var(--ink2);min-height:1.4em;margin:14px 0 0;line-height:1.5}
+.explain b.v{color:var(--verify)}.explain b.e{color:var(--exec)}
+
+/* tape walker */
+.walker{background:var(--raised);border:1px solid var(--line);border-radius:14px;padding:26px 24px 24px;margin-top:40px}
+.walk-top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 22px}
+.btn{font-family:var(--mono);font-size:13px;font-weight:700;color:#06281d;background:var(--verify);
+  border:none;border-radius:8px;padding:11px 18px;cursor:pointer;transition:transform .14s var(--ease-out),filter .18s}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:scale(.96)}
+.btn[disabled]{opacity:.5;cursor:default}
+.chk{font-family:var(--mono);font-size:12.5px;color:var(--ink2);display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.chk input{accent-color:var(--exec);width:15px;height:15px}
+.ptr-read{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.ptr-read b{color:var(--ink);font-weight:700}
+.tape{position:relative;height:66px;border-radius:9px;overflow:hidden;background:var(--code);border:1px solid var(--line2)}
+.tape .zone{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em}
+.tape .z-zero{left:0;width:64%;color:var(--muted);border-right:1px dashed var(--line2)}
+.tape .z-flag{right:0;width:36%;color:var(--flag)}
+.tape .boundary{position:absolute;top:0;bottom:0;left:64%;width:1px;background:var(--line2)}
+.tape .bl{position:absolute;top:5px;left:calc(64% + 7px);font-family:var(--mono);font-size:12px;color:var(--exec)}
+.tape .pointer{position:absolute;top:8px;bottom:8px;width:10px;left:2%;border-radius:3px;
+  background:var(--exec);transition:left .05s linear}
+.tape .pointer::after{content:"▲";position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);color:var(--exec);font-size:9px}
+.out{margin-top:20px}
+.out .lbl{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 7px;letter-spacing:.04em}
+.console{font-family:var(--mono);font-size:clamp(13px,2.6vw,17px);background:var(--code);border:1px solid var(--line2);
+  border-radius:9px;padding:15px 16px;min-height:3.1em;color:var(--flag);word-break:break-all;line-height:1.5}
+.console .cursor{display:inline-block;width:8px;height:1.05em;background:var(--flag);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.walk-note{font-family:var(--mono);font-size:12px;color:var(--muted);margin:16px 0 0;line-height:1.6}
+.walk-note code{background:var(--raised2);padding:.1em .4em;border-radius:4px;color:var(--ink2)}
+@media(prefers-reduced-motion:reduce){.tape .pointer{transition:none}}
+
+/* ===== shell: sidebar + doc ===== */
+.shell{max-width:86rem;margin:0 auto;padding:36px 28px 120px;display:grid;grid-template-columns:1fr;gap:56px}
+@media(min-width:1080px){.shell{grid-template-columns:234px minmax(0,1fr)}}
 .toc{display:none}
 @media(min-width:1080px){
-  .toc{display:block;position:sticky;top:76px;align-self:start;max-height:calc(100vh - 96px);
+  .toc{display:block;position:sticky;top:78px;align-self:start;max-height:calc(100vh - 100px);
     overflow:auto;padding-right:8px;font-size:13.5px;line-height:1.3}
-  .toc .lbl{color:var(--muted);font-size:11.5px;letter-spacing:.08em;
-    text-transform:uppercase;margin:0 0 14px;font-family:var(--mono)}
-  .toc a{display:block;color:var(--ink2);padding:5px 0 5px 12px;
-    border-left:2px solid var(--line);transition:color .15s,border-color .15s}
+  .toc .lbl{color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin:0 0 14px;font-family:var(--mono)}
+  .toc a{display:block;color:var(--ink2);padding:5px 0 5px 13px;border-left:2px solid var(--line);transition:color .18s,border-color .18s}
   .toc a:hover{color:var(--ink);text-decoration:none}
-  .toc a.on{color:var(--accent);border-left-color:var(--accent)}
+  .toc a.on{color:var(--verify);border-left-color:var(--verify)}
 }
 .toc-m{display:block;margin:0 0 8px}
 @media(min-width:1080px){.toc-m{display:none}}
-.toc-m summary{cursor:pointer;color:var(--ink2);font-family:var(--mono);font-size:14px;
-  padding:12px 0;list-style:none}
+.toc-m summary{cursor:pointer;color:var(--ink2);font-family:var(--mono);font-size:14px;padding:12px 0;list-style:none}
 .toc-m summary::-webkit-details-marker{display:none}
-.toc-m summary::before{content:"▸ ";color:var(--accent)}
+.toc-m summary::before{content:"▸ ";color:var(--verify)}
 .toc-m[open] summary::before{content:"▾ "}
 .toc-m a{display:block;color:var(--ink2);padding:6px 0 6px 16px;font-size:14.5px}
 
 /* document body */
 .doc{min-width:0;max-width:var(--maxprose)}
-.doc h2,.doc h3,.doc h4{font-family:var(--sans);letter-spacing:-.015em;line-height:1.15;scroll-margin-top:86px}
-.doc h2{font-size:clamp(1.5rem,3.4vw,2.05rem);font-weight:600;margin:3.2em 0 .7em;
-  padding-top:1.1em;border-top:1px solid var(--line)}
-.doc h2:first-of-type{border-top:none;padding-top:0;margin-top:0} /* subtitle (hidden) */
+.doc h2,.doc h3,.doc h4{font-family:var(--sans);letter-spacing:-.015em;line-height:1.15;scroll-margin-top:88px}
+.doc h2{font-size:clamp(1.55rem,3.4vw,2.1rem);font-weight:600;margin:2.9em 0 .7em}
+.doc h2::before{content:"";display:block;width:34px;height:3px;background:var(--verify);border-radius:2px;margin:0 0 1.1rem}
+.doc h2:first-of-type{margin-top:0}
 .doc h3{font-size:1.3rem;font-weight:600;margin:2.2em 0 .6em;color:var(--ink)}
 .doc h4{font-size:1.08rem;font-weight:600;margin:1.8em 0 .5em;color:var(--ink2)}
 .doc p{margin:1.05em 0;color:var(--ink)}
-.doc h2 .anchor,.doc h3 .anchor,.doc h4 .anchor{
-  margin-left:.4em;color:var(--accent-dim);opacity:0;font-weight:400;text-decoration:none;transition:opacity .15s}
+.doc em{font-style:italic;color:var(--ink)}
+.doc h2 .anchor,.doc h3 .anchor,.doc h4 .anchor{margin-left:.4em;color:var(--verify-dim);opacity:0;font-weight:400;text-decoration:none;transition:opacity .15s}
 .doc h2:hover .anchor,.doc h3:hover .anchor,.doc h4:hover .anchor{opacity:1}
-
-/* the subtitle (first h2) becomes hero text, so hide the duplicate in doc flow */
 .doc > h2:first-of-type{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-/* the H1 and the facts blockquote live in the hero, not the doc flow */
 .doc > h1:first-of-type{display:none}
 .doc > blockquote:first-of-type{display:none}
-
 .doc ul,.doc ol{margin:1.05em 0;padding-left:1.4em}
 .doc li{margin:.42em 0}
 .doc li::marker{color:var(--muted)}
 .doc strong{color:#fff;font-weight:600}
-.doc hr{border:none;height:1px;background:var(--line);margin:3em 0}
-
-.doc code{font-family:var(--mono);font-size:.86em;background:var(--raised2);
-  padding:.14em .4em;border-radius:5px;color:var(--flag)}
+.doc hr{border:none;height:0;margin:3.2em 0}
+.doc code{font-family:var(--mono);font-size:.86em;background:var(--raised2);padding:.14em .4em;border-radius:5px;color:var(--flag);overflow-wrap:anywhere;word-break:break-word}
 .doc h2 code,.doc h3 code,.doc h4 code{font-size:.82em;background:none;color:inherit;padding:0}
-
-/* blockquotes (callouts) */
-.doc blockquote{margin:1.6em 0;padding:14px 20px;background:var(--raised);
-  border-left:3px solid var(--accent);border-radius:0 8px 8px 0;color:var(--ink2)}
+.doc blockquote{margin:1.6em 0;padding:14px 20px;background:var(--raised);border-left:3px solid var(--verify);border-radius:0 8px 8px 0;color:var(--ink2)}
 .doc blockquote strong{color:var(--ink)}
 
 /* code blocks */
-pre.code{position:relative;margin:1.5em 0;background:var(--code);border:1px solid var(--line);
-  border-radius:10px;padding:18px 20px;overflow:auto;font-family:var(--mono);
-  font-size:13.5px;line-height:1.62;color:#c7d1dc}
+pre.code{position:relative;margin:1.5em 0;background:var(--code);border:1px solid var(--line);border-radius:10px;
+  padding:18px 20px;overflow:auto;font-family:var(--mono);font-size:13.5px;line-height:1.62;color:#c7d1dc}
 pre.code code{background:none;color:inherit;padding:0;font-size:inherit}
 pre.code.ascii{color:#9fb0c0;font-size:12.8px;line-height:1.5}
-pre.code .copy{position:absolute;top:9px;right:9px;font-family:var(--mono);font-size:11px;
-  color:var(--muted);background:var(--raised2);border:1px solid var(--line);border-radius:6px;
-  padding:4px 9px;cursor:pointer;opacity:0;transition:opacity .15s,color .15s}
+pre.code .copy{position:absolute;top:9px;right:9px;font-family:var(--mono);font-size:11px;color:var(--muted);
+  background:var(--raised2);border:1px solid var(--line);border-radius:6px;padding:4px 9px;cursor:pointer;opacity:0;transition:opacity .15s,color .15s}
 pre.code:hover .copy{opacity:1}
-pre.code .copy:hover{color:var(--accent)}
-pre.code .copy.done{color:var(--accent);opacity:1}
-
-/* pygments — restrained terminal theme */
-pre.code .c,pre.code .c1,pre.code .cm,pre.code .cp,pre.code .cs{color:#5e6b78;font-style:italic}
+pre.code .copy:hover{color:var(--verify)}
+pre.code .copy.done{color:var(--verify);opacity:1}
+pre.code .c,pre.code .c1,pre.code .cm,pre.code .cp,pre.code .cs{color:#808d9b;font-style:italic}
 pre.code .k,pre.code .kd,pre.code .kn,pre.code .kc,pre.code .kt,pre.code .kr{color:#c99ad2}
 pre.code .s,pre.code .s1,pre.code .s2,pre.code .sb,pre.code .se,pre.code .sd,pre.code .sh,pre.code .sx{color:#9ad99a}
 pre.code .m,pre.code .mi,pre.code .mf,pre.code .mh,pre.code .mo,pre.code .il{color:#e0b072}
@@ -146,47 +210,96 @@ pre.code .err{color:inherit}
 /* tables */
 .tablewrap{overflow-x:auto;margin:1.5em 0}
 table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.45}
-thead th{text-align:left;color:var(--ink);font-weight:600;padding:9px 14px;
-  background:var(--raised2);border-bottom:1px solid var(--accent-dim)}
+thead th{text-align:left;color:var(--ink);font-weight:600;padding:9px 14px;background:var(--raised2);border-bottom:1px solid var(--verify-dim)}
 tbody td{padding:9px 14px;border-bottom:1px solid var(--line);color:var(--ink2);vertical-align:top}
 tbody tr:hover td{background:var(--raised)}
 table code{font-size:.86em}
 
 /* footer */
-footer{border-top:1px solid var(--line);max-width:84rem;margin:0 auto;
-  padding:40px 28px 80px;color:var(--muted);font-size:14px}
+footer{border-top:1px solid var(--line);max-width:86rem;margin:0 auto;padding:44px 28px 90px;color:var(--muted);font-size:14px}
 footer b{color:var(--ink2);font-weight:600}
-footer .flag{font-family:var(--mono);color:var(--flag)}
+footer .fflag{font-family:var(--mono);color:var(--flag);margin-top:10px;font-size:15px}
 
-/* reveal */
-.reveal{opacity:0;transform:translateY(14px)}
-.reveal.in{opacity:1;transform:none;transition:opacity .5s ease,transform .5s ease}
-@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
+/* reveal choreography */
+.reveal{opacity:0;transform:translateY(18px)}
+.reveal.in{opacity:1;transform:none;transition:opacity .7s var(--ease-expo),transform .7s var(--ease-expo)}
+.reveal.d1.in{transition-delay:.07s}.reveal.d2.in{transition-delay:.14s}.reveal.d3.in{transition-delay:.2s}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1!important;transform:none!important}
+  #byterain{display:none}.hero h1,.flagchars span{opacity:1!important}}
 </style>
 </head>
 <body>
+<div class="progress" id="progress"></div>
 <div class="topbar"><div class="in">
   <span class="brand"><b>//</b> Intigriti 1126 · Super Fast Server</span>
-  <span class="sev">Medium · <span class="live">verified live ✓</span></span>
+  <span class="sev">Medium · <span class="live">verified live</span></span>
 </div></div>
 
 <header class="hero">
-  <h1 class="doc-h1">Verify one range, execute another.</h1>
-  <p class="sub">How Intigriti Challenge 1126's signed-code gate was bypassed by making the verifier and the executor disagree about which bytes matter.</p>
-  <div class="facts">
-    <div class="f"><div class="k">Flag</div><div class="v flag">INTIGRITI{4c0532a9-f169-4a5d-ae02-a8b0671d2b07}</div></div>
-    <div class="f"><div class="k">Target</div><div class="v">POST /custom_protocol</div></div>
-    <div class="f"><div class="k">Bug class</div><div class="v">CWE-347 / CWE-807 → CWE-125</div></div>
-    <div class="f"><div class="k">Severity</div><div class="v">Medium · CVSS 4.0</div></div>
-    <div class="f"><div class="k">Primitive</div><div class="v">unsigned Brainfuck → OOB read</div></div>
-    <div class="f"><div class="k">Status</div><div class="v ok">verified live · 2026-11-24</div></div>
+  <canvas id="byterain" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <p class="kick">Intigriti November Challenge · by whatevidc · solved &amp; verified live</p>
+    <h1>Verify one range,<br>execute another.</h1>
+    <p class="sub">How a signed-code gate was bypassed by making the verifier and the executor disagree about which bytes matter.</p>
+    <a class="cta" href="#anatomy">Walk the exploit</a>
+    <div class="facts">
+      <div class="f"><div class="k">FLAG</div><div class="v flag" id="flagv" data-flag="INTIGRITI{4c0532a9-f169-4a5d-ae02-a8b0671d2b07}">INTIGRITI{4c0532a9-f169-4a5d-ae02-a8b0671d2b07}</div></div>
+      <div class="f"><div class="k">TARGET</div><div class="v">POST /custom_protocol</div></div>
+      <div class="f"><div class="k">BUG CLASS</div><div class="v">CWE-347 / 807 → CWE-125</div></div>
+      <div class="f"><div class="k">SEVERITY</div><div class="v">Medium · CVSS 4.0</div></div>
+      <div class="f"><div class="k">PRIMITIVE</div><div class="v">unsigned Brainfuck → OOB read</div></div>
+      <div class="f"><div class="k">STATUS</div><div class="v ok">verified live · 2026-11-24</div></div>
+    </div>
   </div>
 </header>
 
+<!-- ===== signature interactive ===== -->
+<section class="exhibit" id="anatomy" aria-label="How the bypass works">
+  <div class="in">
+    <h2 class="reveal">Hashed here. Executed there.</h2>
+    <p class="lead reveal d2">The server hashes one byte range and runs another. Append a second <b>DATA</b> of the same length as the signed one: the hashed span never changes, so the signature still passes — but execution jumps to your bytes. Then the Brainfuck tape walks straight off its end into the flag.</p>
+
+    <div class="panel reveal" data-ui>
+      <div class="panel-h"><h3>The request</h3><span class="note">last DATA wins for execution · its length still feeds the hash</span></div>
+      <div class="seg" role="tablist" aria-label="Highlight">
+        <button data-k="v" class="on">What gets verified</button>
+        <button data-k="e">What gets executed</button>
+      </div>
+      <div class="frames" id="frames">
+        <div class="frame" data-r="auth"><span class="tag tv">hashed</span><span class="tag te">run</span><div class="fn">AUTH</div><div class="fd">106 B secret</div></div>
+        <div class="frame" data-r="code"><span class="tag tv">hashed</span><span class="tag te">run</span><div class="fn">CODE</div><div class="fd">396 B · interpreter</div></div>
+        <div class="frame" data-r="data1"><span class="tag tv">hashed</span><span class="tag te">run</span><div class="fn">DATA #1</div><div class="fd">424 B · signed BF</div></div>
+        <div class="frame" data-r="data2"><span class="tag tv">hashed</span><span class="tag te">run</span><div class="fn">DATA #2</div><div class="fd">424 B · attacker BF</div></div>
+        <div class="frame" data-r="sign"><span class="tag tv">hashed</span><span class="tag te">run</span><div class="fn">SIGN</div><div class="fd">256 B · RSA-2048</div></div>
+        <div class="frame" data-r="exec"><span class="tag tv">hashed</span><span class="tag te">run</span><div class="fn">EXEC</div><div class="fd">0 B · trigger</div></div>
+      </div>
+      <p class="explain" id="explain"></p>
+    </div>
+
+    <div class="walker reveal" data-ui>
+      <div class="walk-top">
+        <button class="btn" id="runbtn">▶ Run the exploit</button>
+        <label class="chk"><input type="checkbox" id="gotcha"> forget the <code style="font-family:inherit">&gt;</code> (the gotcha)</label>
+        <span class="ptr-read">tape pointer: <b id="ptr">0</b></span>
+      </div>
+      <div class="tape" id="tape">
+        <div class="zone z-zero">cells 0–255 · zeroed TLS tape</div>
+        <div class="boundary"></div>
+        <div class="bl">cell 256 = flag</div>
+        <div class="zone z-flag">flag buffer · TLS−0x60</div>
+        <div class="pointer" id="pointer"></div>
+      </div>
+      <div class="out">
+        <p class="lbl">INTERPRETER OUTPUT</p>
+        <div class="console" id="console"><span class="cursor"></span></div>
+      </div>
+      <p class="walk-note"><code>'&gt;'*256</code> steps the pointer to the flag; <code>'.&gt;'*84</code> prints each cell and advances. Tick the box to see why <code>'.'</code> alone prints <code>IIII…</code> — it reads the same cell without moving.</p>
+    </div>
+  </div>
+</section>
+
 <div class="shell">
-  <nav class="toc" aria-label="Contents">
-    <p class="lbl">Contents</p>
-    <a href="#1-the-one-paragraph-version">1. The one-paragraph version</a>
+  <nav class="toc" aria-label="Contents"><p class="lbl">Contents</p><a href="#1-the-one-paragraph-version">1. The one-paragraph version</a>
 <a href="#2-mental-model-what-the-challenge-actually-is">2. Mental model: what the challenge actually is</a>
 <a href="#3-recon--turning-a-web-server-into-a-binary">3. Recon — turning a web server into a binary</a>
 <a href="#4-looting-the-binary-with-strings">4. Looting the binary with `strings`</a>
@@ -211,8 +324,7 @@ footer .flag{font-family:var(--mono);color:var(--flag)}
 <a href="#appendix-a--the-binary-address-by-address">Appendix A — the binary, address by address</a>
 <a href="#appendix-b--protocol-cheat-sheet">Appendix B — protocol cheat-sheet</a>
 <a href="#appendix-c--full-solve-timeline">Appendix C — full solve timeline</a>
-<a href="#appendix-d--live-verification-log">Appendix D — live verification log</a>
-  </nav>
+<a href="#appendix-d--live-verification-log">Appendix D — live verification log</a></nav>
   <main class="doc">
     <details class="toc-m"><summary>Contents</summary><a href="#1-the-one-paragraph-version">1. The one-paragraph version</a>
 <a href="#2-mental-model-what-the-challenge-actually-is">2. Mental model: what the challenge actually is</a>
@@ -242,7 +354,7 @@ footer .flag{font-family:var(--mono);color:var(--flag)}
 <a href="#appendix-d--live-verification-log">Appendix D — live verification log</a></details>
     <h1 id="intigriti-challenge-1126--super-fast-server">Intigriti Challenge 1126 — "Super Fast Server"<a class="anchor" href="#intigriti-challenge-1126--super-fast-server" aria-label="Link">#</a></h1>
 <h2 id="a-full-teardown-how-a-signed-code-gate-was-bypassed-by-making-the-verifier-and-the-executor-disagree-about-which-bytes-matter">A full teardown: how a signed-code gate was bypassed by making the verifier and the executor disagree about which bytes matter<a class="anchor" href="#a-full-teardown-how-a-signed-code-gate-was-bypassed-by-making-the-verifier-and-the-executor-disagree-about-which-bytes-matter" aria-label="Link">#</a></h2>
-<blockquote><strong>Flag:</strong> <code>INTIGRITI{4c0532a9-f169-4a5d-ae02-a8b0671d2b07}</code> <strong>Target:</strong> <code>https://challenge-1126.challenges.intigriti.io</code> · endpoint <code>POST /custom_protocol</code> <strong>Binary:</strong> <code>GET /superfastserver</code> — ELF64, x86-64, PIE, stripped, 47,880 bytes (served behind <code>istio-envoy</code>) <strong>Primitive:</strong> arbitrary <em>unsigned</em> Brainfuck execution → out-of-bounds tape read → disclosure of a runtime-only flag held in thread-local storage <strong>Bug class:</strong> CWE-347 / CWE-807 (signature covers a different byte range than the one executed) leading to CWE-125 (out-of-bounds read) <strong>Severity:</strong> Medium — <code>CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N</code> (confidentiality-only) ✅ <strong>Every claim below was re-verified live against the server and the downloaded binary on 2026-11-24.</strong> Addresses are from <code>capstone</code> disassembly of the retrieved ELF; protocol behaviour and the flag are from live <code>POST</code>s. Raw evidence is in <a href="#appendix-d--live-verification-log">Appendix D</a>.</blockquote>
+<blockquote><strong>Flag:</strong> <code>INTIGRITI{4c0532a9-f169-4a5d-ae02-a8b0671d2b07}</code> <strong>Target:</strong> <code>https://challenge-1126.challenges.intigriti.io</code> · endpoint <code>POST /custom_protocol</code> <strong>Binary:</strong> <code>GET /superfastserver</code> — ELF64, x86-64, PIE, stripped, 47,880 bytes (served behind <code>istio-envoy</code>) <strong>Primitive:</strong> arbitrary <em>unsigned</em> Brainfuck execution → out-of-bounds tape read → disclosure of a runtime-only flag held in thread-local storage <strong>Bug class:</strong> CWE-347 / CWE-807 (signature covers a different byte range than the one executed) leading to CWE-125 (out-of-bounds read) <strong>Severity:</strong> Medium — <code>CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N</code> (confidentiality-only) <strong>Every claim below was re-verified live against the server and the downloaded binary on 2026-11-24.</strong> Addresses are from <code>capstone</code> disassembly of the retrieved ELF; protocol behaviour and the flag are from live <code>POST</code>s. Raw evidence is in <a href="#appendix-d--live-verification-log">Appendix D</a>.</blockquote>
 <hr>
 <h2 id="1-the-one-paragraph-version">1. The one-paragraph version<a class="anchor" href="#1-the-one-paragraph-version" aria-label="Link">#</a></h2>
 <p>The server exposes a custom binary protocol that will only execute code carrying a valid RSA-2048 signature. It signs two blobs together — <code>CODE</code> (an interpreter) and <code>DATA</code> (a program) — and refuses anything else. The flaw is that the code that <strong>verifies</strong> the signature and the code that <strong>executes</strong> the program read <em>different fields of the parsed request</em>. Verification hashes a byte range whose start is one tracked position and whose length is the <strong>sum of two tracked lengths</strong>; execution runs the interpreter against the program at the <strong>last</strong> <code>DATA</code> position. Those are decoupled, guarded only by a single <code>&gt;=</code> ordering check. Send a legitimately signed bundle, then append a <strong>second <code>DATA</code> command of exactly the same length</strong> as the signed one: the hashed range is byte-for-byte unchanged (so the signature still validates) but execution now jumps to your program. The interpreter is an unbounded Brainfuck VM whose tape sits <code>0x100</code> bytes below a buffer into which the real flag is <code>fread</code> at startup, so <code>&gt;</code>×256 walks the tape pointer straight onto the flag and <code>.&gt;</code> dumps it. No private key, no signature forgery, no memory-corruption exploit.</p>
@@ -437,8 +549,8 @@ delta = 0x100 = 256 cells</code></pre>
 <pre class="code ascii"><button class="copy" aria-label="Copy">Copy</button><code>  tape cell 0 … 255   : all zero   (fresh, zeroed TLS tape)
   tape cell 256       : 'I'        (first byte of INTIGRITI{…})
   tape cell 256 …     : the flag, then NULs</code></pre>
-<pre class="code ascii"><button class="copy" aria-label="Copy">Copy</button><code>  '&gt;'*256 + '.'*168      → "IIIIIII…"   (reads cell 256 repeatedly — the 'I')   ✓ live
-  '&gt;'*256 + '.&gt;'*84      → the full flag                                         ✓ live</code></pre>
+<pre class="code ascii"><button class="copy" aria-label="Copy">Copy</button><code>  '&gt;'*256 + '.'*168      → "IIIIIII…"   (reads cell 256 repeatedly — the 'I')   [live]
+  '&gt;'*256 + '.&gt;'*84      → the full flag                                         [live]</code></pre>
 <p>The flag was confirmed multiple times with independent programs before a line of the report was written.</p>
 <hr>
 <h2 id="13-the-brainfuck-gotcha-that-costs-everyone-a-run">13. The Brainfuck gotcha that costs everyone a run<a class="anchor" href="#13-the-brainfuck-gotcha-that-costs-everyone-a-run" aria-label="Link">#</a></h2>
@@ -633,40 +745,146 @@ FLAG = INTIGRITI{4c0532a9-f169-4a5d-ae02-a8b0671d2b07}</code></pre>
 
 <footer>
   <p>Write-up of the <b>Intigriti November Challenge (1126) — "Super Fast Server"</b>, by <b>whatevidc</b>. Every claim was re-verified live against the server and the downloaded binary on 2026-11-24.</p>
-  <p class="flag">INTIGRITI{4c0532a9-f169-4a5d-ae02-a8b0671d2b07}</p>
+  <p class="fflag">INTIGRITI{4c0532a9-f169-4a5d-ae02-a8b0671d2b07}</p>
 </footer>
 
 <script>
-// copy buttons
+var RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* reading progress */
+var pb=document.getElementById('progress');
+addEventListener('scroll',function(){
+  var h=document.documentElement,max=h.scrollHeight-h.clientHeight;
+  pb.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+},{passive:true});
+
+/* hero byte rain */
+(function(){
+  if(RM)return;
+  var cv=document.getElementById('byterain'),cx=cv.getContext('2d');
+  var glyphs='0123456789ABCDEF'.split(''),cols,drops,fs=16,W,H,last=0;
+  function size(){W=cv.width=cv.offsetWidth*devicePixelRatio;H=cv.height=cv.offsetHeight*devicePixelRatio;
+    cx.font=(fs*devicePixelRatio)+'px JetBrains Mono, monospace';cols=Math.floor(W/(fs*devicePixelRatio));
+    drops=Array(cols).fill(0).map(function(){return Math.random()*-60;});}
+  size();addEventListener('resize',size);
+  function frame(t){
+    if(t-last>95){last=t;cx.clearRect(0,0,W,H);
+      for(var i=0;i<cols;i++){var y=drops[i]*fs*devicePixelRatio;
+        if(y>0&&y<H){cx.fillStyle='rgba(92,215,163,'+(0.1+Math.random()*0.12)+')';
+          cx.fillText(glyphs[(Math.random()*16)|0],i*fs*devicePixelRatio,y);}
+        drops[i]+=0.5;if(y>H&&Math.random()>0.975)drops[i]=Math.random()*-20;}}
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* flag decode on reveal */
+(function(){
+  var el=document.getElementById('flagv');if(!el||RM)return;
+  var fin=el.dataset.flag,hex='0123456789abcdef';
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(!e.isIntersecting)return;io.disconnect();
+    var i=0;var iv=setInterval(function(){
+      var s='';for(var j=0;j<fin.length;j++){s+= j<i?fin[j] : (fin[j]==='{'||fin[j]==='}'||fin[j]==='-'?fin[j]:hex[(Math.random()*16)|0]);}
+      el.textContent=s;i+=1.4;if(i>=fin.length){el.textContent=fin;clearInterval(iv);}
+    },28);
+  });},{threshold:.6});io.observe(el);
+})();
+
+/* request-frame highlight toggle */
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('#frames .frame'));
+  var exp=document.getElementById('explain');
+  var V=new Set(['code','data1']), E=new Set(['data2']);
+  var txt={
+    v:'The hash is <b class="v">SHA-256(buf+pos, CODE_len + DATA_len)</b> — anchored at CODE, sized by the <b class="v">last</b> DATA length. DATA #2 is 424 B, same as DATA #1, so the hashed span is byte-identical to the signed one. Signature passes.',
+    e:'EXEC runs the interpreter at the <b class="e">last DATA position</b> — that is DATA #2, your bytes. The only guard is <b class="e">pos ≥ CODE_pos</b>; nothing ties the executed position to the hashed one.'
+  };
+  function apply(k){
+    var set=k==='v'?V:E;
+    frames.forEach(function(f){var r=f.dataset.r;f.classList.remove('hl-v','hl-e','dim');
+      if(set.has(r))f.classList.add(k==='v'?'hl-v':'hl-e');else f.classList.add('dim');});
+    exp.innerHTML=txt[k];
+    document.querySelectorAll('.seg button').forEach(function(b){b.classList.toggle('on',b.dataset.k===k);});
+  }
+  document.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){apply(b.dataset.k);});});
+  apply('v');
+})();
+
+/* tape walker */
+(function(){
+  var btn=document.getElementById('runbtn'),ptr=document.getElementById('pointer'),
+      ptrR=document.getElementById('ptr'),cons=document.getElementById('console'),
+      gotcha=document.getElementById('gotcha'),tape=document.getElementById('tape');
+  var FLAG='INTIGRITI{4c0532a9-f169-4a5d-ae02-a8b0671d2b07}';
+  var running=false;
+  function pos(p){ // map cell index 0..300 to % within tape
+    var pct=p<=256? (p/256)*64 : 64 + ((p-256)/44)*34;
+    ptr.style.left='calc('+Math.min(pct,98)+'% - 5px)';ptrR.textContent=p;
+  }
+  function reset(){pos(0);cons.innerHTML='<span class="cursor"></span>';}
+  reset();
+  function run(){
+    if(running)return;running=true;btn.disabled=true;cons.innerHTML='';
+    var bad=gotcha.checked;
+    var p=0, out='', phase='walk', emitted=0;
+    var speed=RM?0:1;
+    function step(){
+      if(phase==='walk'){
+        p+=4; if(p>=256){p=256;phase='dump';}
+        pos(p);
+        if(!speed){p=256;phase='dump';pos(256);}
+        setTimeout(step, 6);
+      } else {
+        // dump: '.>' prints FLAG[emitted] then advances; '.' (bad) reprints cell 256 = 'I'
+        var ch = bad ? FLAG[0] : FLAG[emitted];
+        out += ch;
+        cons.innerHTML = out + '<span class="cursor"></span>';
+        if(!bad){ p=256+emitted+1; pos(p); }
+        emitted++;
+        if(emitted < FLAG.length){ setTimeout(step, speed?42:0); }
+        else { cons.innerHTML=out; running=false; btn.disabled=false; }
+      }
+    }
+    step();
+  }
+  btn.addEventListener('click',run);
+  gotcha.addEventListener('change',function(){reset();});
+})();
+
+/* scrollspy TOC */
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.toc a'));
+  if(!links.length)return;
+  var map={};links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a;});
+  var heads=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  var spy=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(e.isIntersecting){links.forEach(function(a){a.classList.remove('on');});var a=map[e.target.id];if(a)a.classList.add('on');}
+  });},{rootMargin:'-80px 0px -70% 0px',threshold:0});
+  heads.forEach(function(h){spy.observe(h);});
+})();
+
+/* copy buttons */
 document.querySelectorAll('pre.code .copy').forEach(function(btn){
   btn.addEventListener('click',function(){
-    var code=btn.parentElement.querySelector('code');
-    navigator.clipboard.writeText(code.innerText).then(function(){
+    navigator.clipboard.writeText(btn.parentElement.querySelector('code').innerText).then(function(){
       btn.textContent='Copied';btn.classList.add('done');
-      setTimeout(function(){btn.textContent='Copy';btn.classList.remove('done');},1400);
-    });
+      setTimeout(function(){btn.textContent='Copy';btn.classList.remove('done');},1400);});
   });
 });
-// scrollspy TOC
-var links=[].slice.call(document.querySelectorAll('.toc a'));
-var map={};links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a;});
-var heads=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
-var spy=new IntersectionObserver(function(es){
-  es.forEach(function(e){
+
+/* choreographed reveals */
+(function(){
+  var rev=new IntersectionObserver(function(es){es.forEach(function(e){
     if(e.isIntersecting){
-      links.forEach(function(a){a.classList.remove('on');});
-      var a=map[e.target.id];if(a)a.classList.add('on');
-    }
+      var sec=e.target, kids=sec.querySelectorAll(':scope > *');
+      e.target.classList.add('in');rev.unobserve(e.target);
+    }});},{rootMargin:'0px 0px -8% 0px',threshold:0.05});
+  // mark doc blocks + exhibit pieces
+  document.querySelectorAll('.doc h2, .doc h3, .doc p, .doc pre.code, .doc .tablewrap, .doc blockquote, .doc ul, .doc ol, .exhibit .reveal, .walker, .panel').forEach(function(el){
+    if(!el.classList.contains('reveal'))el.classList.add('reveal');rev.observe(el);
   });
-},{rootMargin:'-80px 0px -70% 0px',threshold:0});
-heads.forEach(function(h){spy.observe(h);});
-// reveal on scroll
-var rev=new IntersectionObserver(function(es){
-  es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');rev.unobserve(e.target);}});
-},{rootMargin:'0px 0px -8% 0px',threshold:0.04});
-document.querySelectorAll('.doc h2, .doc h3, .doc p, .doc pre.code, .doc .tablewrap, .doc blockquote, .doc ul, .doc ol').forEach(function(el){
-  el.classList.add('reveal');rev.observe(el);
-});
+})();
 </script>
 </body>
 </html>
